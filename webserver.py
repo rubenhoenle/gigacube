@@ -1,59 +1,121 @@
-import network
-import time
+# Bibliotheken laden
 import socket
+import time
+import network
+#from test import GameLogic
+
+# HTML
+#html = """<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="shortcut icon" href="data:"><title>Raspberry Pi Pico</title></head><body><h1 align="center">Raspberry Pi Pico W</h1><p align="center">Verbindung mit %s</p></body></html>"""
+html = """
+        <!DOCTYPE html>
+<html>
+<head>
+    <title>Pico Web Server</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px; /* Höhe des Steuerkreuzes */
+        }
+        .arrow {
+            font-size: 48px;
+            width: 60px;
+            height: 60px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            color: #007bff; /* Standardfarbe für die Pfeiltasten */
+            transition: color 0.3s; /* Animationsübergang */
+        }
+        .arrow:hover {
+            color: #0056b3; /* Farbe bei Hover */
+        }
+    </style>
+</head>
+<body>
+    <h1>Raspberry Pi Pico Web Server</h1>
+    <h2>Snake</h2>
+    <div class="arrow-container">
+        <form action="./up">
+            <button class="arrow" type="submit">&uarr;</button> <!-- Pfeil nach oben -->
+        </form>
+    </div>
+    <div class="arrow-container">
+        <form action="./left">
+            <button class="arrow" type="submit">&larr;</button> <!-- Pfeil nach links -->
+        </form>
+        <form action="./right">
+            <button class="arrow" type="submit">&rarr;</button> <!-- Pfeil nach rechts -->
+        </form>
+    </div>
+    <div class="arrow-container">
+        <form action="./down">
+            <button class="arrow" type="submit">&darr;</button> <!-- Pfeil nach unten -->
+        </form>
+    </div>
+</body>
+</html>
+
+"""
+
+ap = network.WLAN(network.AP_IF)
+ap.config(essid="Pi_Pico_Snake", password="HackenMitLicht")
+ap.active(True)
+
+while ap.active() == False:
+    pass
+print('AP Mode Is Active, You can Now Connect')
+print('IP Address To Connect to:: ' + ap.ifconfig()[0])
 
 
-class Webserver:
-    def __init__(self):
-        self.ap_mode('Pi_Pico_Snake', 'HackenMitLicht')
-        self.s = None
+print('Starting server')
+addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
+server = socket.socket()
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(addr)
+server.listen(1)
+print('Server is listening on', addr)
+print()
+
+# Auf eingehende Verbindungen hören
+def webserver_hook(gamelogic):
+    conn, addr = server.accept()
+    print('HTTP-Request from client', addr)
+    request = conn.recv(1024)
+    # HTTP-Request anzeigen
+    print('Request:', request)
     
-    def web_page(self):
-      html = """<html><head><meta name="viewport" content="width=device-width, initial-scale=1"></head>
-                <body><h1>Hello World</h1></body></html>
-             """
-      return html
+    request = str(request)
+    print('Request content = %s' % request)
 
-    # if you do not see the network you may have to power cycle
-    # unplug your pico w for 10 seconds and plug it in again
-    def ap_mode(self, ssid, password):
-        """
-            Description: This is a function to activate AP mode
-            
-            Parameters:
-            
-            ssid[str]: The name of your internet connection
-            password[str]: Password for your internet connection
-            
-            Returns: Nada
-        """
-        # Just making our internet connection
-        ap = network.WLAN(network.AP_IF)
-        ap.config(essid=ssid, password=password)
-        ap.active(True)
-        
-        while ap.active() == False:
-            pass
-        print('AP Mode Is Active, You can Now Connect')
-        print('IP Address To Connect to:: ' + ap.ifconfig()[0])
-        
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)   #creating socket object
-        self.s.bind(('', 80))
-        self.s.listen(5)
+    try:
+        request = request.split()[1]
+        #print('Request:', request)
+    except IndexError:
+        pass
+    
+    # Process the request and update variables
+    if request == '/right?':
+        gamelogic.players[0].moveRight()
+    elif request == '/left?':
+        gamelogic.players[0].moveLeft()
+    elif request == '/up?':
+        gamelogic.players[0].moveUp()
+    elif request == '/down?':
+        gamelogic.players[0].moveDown()
 
-    def tick(self):
-        if self.s == None:
-            #print("return")
-            return
-        conn, addr = self.s.accept()
-        print('Got a connection from %s' % str(addr))
-        request = conn.recv(1024)
-        print('Content = %s' % str(request))
-        response = self.web_page()
-        conn.send(response)
-        conn.close()
-        
-webserver = Webserver()
-while True:
-    webserver.tick()
+    
+    # HTTP-Response senden
+    #response = html % str(addr)
+    response = html
+    conn.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')
+    conn.send(response)
+    conn.close()
+    print('HTTP-Response gesendet')
+    print()
 
+
+#while True:
+#    tick()

@@ -1,27 +1,27 @@
-# flake.nix
 {
-  description = "Arduino-IDE, uses unstable";
+  description = "A very basic flake";
 
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  outputs = { self, nixpkgs }: 
+  let
+    system = "x86_64-linux";
+    pkgs = import nixpkgs {
+      inherit system;
+    };
+  in
+  {
+    devShells.${system}.default = pkgs.mkShell {
+      packages = with pkgs; [
+        adafruit-ampy
+      ];
+      env = {
+        AMPY_PORT = "/dev/ttyACM0";
+      };
+      shellHook = ''
+        alias deploy="ampy put lib && ampy put webserver.py"
+        alias reset="ampy reset"
+        alias run="ampy run main.py"
+      '';
+    }; 
+
   };
-
-  outputs = { self, nixpkgs}: 
-    let pkgs = nixpkgs.legacyPackages.x86_64-linux;
-    in {
-
-      devShell.x86_64-linux =
-        pkgs.mkShell { buildInputs = 
-          [         
-            pkgs.arduino-ide
-            pkgs.gnumake
-            pkgs.wget
-            pkgs.cmake
-            pkgs.python3
-            pkgs.python311Packages.pytest
-            pkgs.python311Packages.colorama
-          ];
-
-        };
-   };
 }

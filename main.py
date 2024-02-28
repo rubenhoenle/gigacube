@@ -1,9 +1,7 @@
-# Bibliotheken laden
 from machine import Pin, Timer, ADC
 from neopixel import NeoPixel
 from time import sleep_ms
-#from webserver import Webserver
-import webserver2
+import webserver
 from random import randrange
 from lib.cell_pos import CellPos
 from lib.side import Side
@@ -241,6 +239,6 @@ while True:
     #gamelogic.tick()
     #sleep_ms(speed)
     #webserver.tick()
-    webserver2.webserver_hook(gamelogic)
+    webserver.webserver_hook(gamelogic)
     pass
     
