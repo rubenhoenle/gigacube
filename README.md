@@ -1,16 +1,6 @@
 # Gigacube
 
-This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxes), a project which was done during the ["Hacken mit Licht" Hackathon](https://hacken-mit-licht.de).
-
-## Tests
-
-```bash
-make
-cd src
-cmake
-make
-./tests
-```
+This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxes), a project which was done during the [Hacken mit Licht](https://hacken-mit-licht.de) Hackathon.
 
 ## Hardware
 
@@ -23,9 +13,9 @@ Basis of the game is a cube with the size of 25x25x25cm
 15*45 pixels from left to right
 15*15 pixels on the top.
 
-game is played in 1 (front), 3 (front, top, left) or 4 sides (front, top, left, right).
+Game is played in 1 (front), 3 (front, top, left) or 4 sides (front, top, left, right).
 
-UP is considert starting by the front side. 
+UP is considered starting by the front side. 
 So moving UP at the top side is meaning "to the back".
 
 ## Architecture
@@ -46,27 +36,6 @@ So moving UP at the top side is meaning "to the back".
   - Play animations
   - Start / end game
   - Render a UI frame (UI can be updates more often to per tick to render effects)
-
-```cpp
-enum Direction { UP, DOWN, LEFT, RIGHT }
-enum Side { FRONT, LEFT, TOP, RIGHT }
-class Player {
-    int x, y;
-    Direction direction;
-}
-class PixelPlayerData {
-    bool atPosition, hasTrail, ownedBy;
-    // owned can also be an int that represents the turn when it was captured
-}
-class GameLogic {
-    void start(Player* player1, Player* player2);
-    PlayerPixelData* getPixel(Side side, int x, int y, int player)
-    // moves player, recalculates states of the pixels
-    void tick();
-    // how many turns since the game started
-    int getTurns();
-}
-```
 
 ## Tasks
 
