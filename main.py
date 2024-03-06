@@ -1,12 +1,13 @@
 from machine import Pin, Timer, ADC
 from neopixel import NeoPixel
 from time import sleep_ms
-import webserver
+#import webserver
 from random import randrange
 from lib.cell_pos import CellPos
 from lib.side import Side
 from lib.enums import Direction
 from lib.mapper import Mapper
+from lib.nunchuck import Nunchuck
 
 MATRIX_SIZE = 15
 speed = 200
@@ -190,7 +191,46 @@ gamelogic = GameLogic()
 timer = Timer(-1)
 timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
 
+# nunchuck control
+
+i2c = machine.I2C(
+        0, scl=machine.Pin(5),
+        sda=machine.Pin(4),
+        freq=100000)
+sleep_ms(100)
+
+nun = Nunchuck(i2c)
+
+#sleep_ms(500)
+x = 0
+y = 0
+
 while True:
-    webserver.webserver_hook(gamelogic)
-    pass
+    #webserver.webserver_hook(gamelogic)
+
+    if not nun.joystick_center():
+        if nun.joystick_up():
+            y += 1
+            gamelogic.players[0].moveUp()
+        elif nun.joystick_down():
+            y -= 1
+            gamelogic.players[0].moveDown()
+        if nun.joystick_left():
+            x -= 1
+            gamelogic.players[0].moveLeft()
+        elif nun.joystick_right():
+            x += 1
+            gamelogic.players[0].moveRight()
+    print(x, y, nun.joystick_x(), nun.joystick_y())
+
+    j = nun.joystick()
+    a = nun.accelerator()
+    b = nun.buttons()
+    print("Joystick: X={0: <3} Y={1: <3} Accelerator: X={2: <3} Y={3: <3} Z={4: <3} Buttons: C={5} Z={6}".format(
+            j[0], j[1],
+            a[0], a[1], a[2],
+            b[0], b[1]
+            ))
+
+    sleep_ms(100)
     
