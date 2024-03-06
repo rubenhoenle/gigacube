@@ -1,4 +1,6 @@
-# Dots'n'Boxes
+# Gigacube
+
+This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxes), a project which was done during the ["Hacken mit Licht" Hackathon](https://hacken-mit-licht.de).
 
 ## Tests
 
