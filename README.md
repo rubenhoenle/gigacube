@@ -4,61 +4,40 @@ This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxe
 
 ## Hardware
 
-900 Pixels are available.
-60 Pixels per Meter
+900 Pixels are available at a density of 60 Pixels per Meter.
 
-Basis of the game is a cube with the size of 25x25x25cm 
-4 sides will get 15x15 pixels.
+The basis of the game is a 25x25x25cm cube. 4 sides of the cube are being used, amounting to 15x15 pixels on each used side:
 
-15*45 pixels from left to right
-15*15 pixels on the top.
+- 15\*45 pixels in total from left to right
+- 15\*15 pixels on the top
 
-Game is played in 1 (front), 3 (front, top, left) or 4 sides (front, top, left, right).
+The game can be played with 1 (front), 3 (front, top, left) or 4 sides (front, top, left, right).
 
-UP is considered starting by the front side. 
-So moving UP at the top side is meaning "to the back".
+UP is considered starting by the front side. That means moving UP at the top side corresponds to "to the back".
 
 ## Architecture
 
 - For each pixel 2 player states are stored
 - A player state contains
-  - atPosition: is the player currently at this position
-  - hasTrail: the player currently has a trail
-  - ownedBy: the player has this pixel captured
+  - atPosition: is the player currently at this position?
+  - hasTrail: does the player currently have a trail?
+  - ownedBy: does player have this pixel captured?
 - A pixel can be addressed by 
   - side [0=left, 1=front, 2=right, 3=top]
   - x [0-15]
   - y [0-15]
   - player [0,1]
 - The main class is responsible for orchestration
-  - Execute a tick every x milli seconds
+  - Execute a tick every x milliseconds
   - Read controls
   - Play animations
   - Start / end game
-  - Render a UI frame (UI can be updates more often to per tick to render effects)
+  - Render a UI frame (UI can be updated more often per tick to render effects)
 
-## Tasks
+## Run commands
 
-- Hardware
-  - Build the playground
-
-- Controls
-  - Own buttons
-  - Serial input from PC
-  - Mini Webserver via WIFI
-  - Bluetooth controller
-
-- UI
-  - Game visualisation
-  - Assign LEDs to game plan
-  - Special effects (e.g., blinking when area was captured)
-  - Idle animation
-  - Startdown counter
-
-- Game Logic
-
-- Strech
-  - Additional strip that represents the taken area. 20 LEDs and for each 5% a player holds one LED is activated in the color of the player (or 10 LEDs with 10%)
-  - Play agains bot
-  - Move the box with a serveo depending on the current state of the game (e.g., move areas with a lot of captured boxes in the back)
-  - The speed (ticks per second) and/or brighness of the game could be adjusted by a poti
+|Command|Explanation|
+|---|---|
+|`deploy`|Deploy webserver|
+|`reset`|Reset game|
+|`run`|Start game|

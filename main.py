@@ -53,7 +53,7 @@ class Player:
             self.body.insert(0, self.previous_pos)
             self.body.pop()
         for b in self.body:
-            if self.pos.x == b.x and self.pos.y == b.y: raise ValueError('player bite itself')
+            if self.pos.x == b.x and self.pos.y == b.y: raise ValueError('player bit themselves')
         
     def addLength(self):
         if len(self.body) == 0:
