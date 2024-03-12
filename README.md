@@ -38,6 +38,6 @@ UP is considered starting by the front side. That means moving UP at the top sid
 
 |Command|Explanation|
 |---|---|
-|`deploy`|Deploy webserver|
-|`reset`|Reset game|
-|`run`|Start game|
+|`deploy/npmCi`|Deploy webserver|
+|`reset/cleanEclipse`|Reset game|
+|`run/buildCommand`|Start game|
