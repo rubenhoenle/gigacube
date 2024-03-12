@@ -12,6 +12,8 @@
     devShells.${system}.default = pkgs.mkShell {
       packages = with pkgs; [
         adafruit-ampy
+        jdk21
+        gradle
       ];
       env = {
         AMPY_PORT = "/dev/ttyACM0";
