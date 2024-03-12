@@ -1,4 +1,4 @@
-# Bibliotheken laden
+# Load libraries
 import socket
 import time
 import network
@@ -17,7 +17,7 @@ html = """
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 200px; /* Höhe des Steuerkreuzes */
+            height: 200px; /* Height of the d-pad */
         }
         .arrow {
             font-size: 48px;
@@ -26,11 +26,11 @@ html = """
             border: none;
             background: none;
             cursor: pointer;
-            color: #007bff; /* Standardfarbe für die Pfeiltasten */
-            transition: color 0.3s; /* Animationsübergang */
+            color: #007bff; /* Standard colour for the arrow keys */
+            transition: color 0.3s; /* Animation transition */
         }
         .arrow:hover {
-            color: #0056b3; /* Farbe bei Hover */
+            color: #0056b3; /* Colour on hover */
         }
     </style>
 </head>
@@ -39,20 +39,20 @@ html = """
     <h2>Snake</h2>
     <div class="arrow-container">
         <form action="./up">
-            <button class="arrow" type="submit">&uarr;</button> <!-- Pfeil nach oben -->
+            <button class="arrow" type="submit">&uarr;</button> <!-- Arrow up -->
         </form>
     </div>
     <div class="arrow-container">
         <form action="./left">
-            <button class="arrow" type="submit">&larr;</button> <!-- Pfeil nach links -->
+            <button class="arrow" type="submit">&larr;</button> <!-- Arrow left -->
         </form>
         <form action="./right">
-            <button class="arrow" type="submit">&rarr;</button> <!-- Pfeil nach rechts -->
+            <button class="arrow" type="submit">&rarr;</button> <!-- Arrow right -->
         </form>
     </div>
     <div class="arrow-container">
         <form action="./down">
-            <button class="arrow" type="submit">&darr;</button> <!-- Pfeil nach unten -->
+            <button class="arrow" type="submit">&darr;</button> <!-- Arrow down -->
         </form>
     </div>
 </body>
@@ -79,12 +79,12 @@ server.listen(1)
 print('Server is listening on', addr)
 print()
 
-# Auf eingehende Verbindungen hören
+# Listen to incoming connection
 def webserver_hook(gamelogic):
     conn, addr = server.accept()
     print('HTTP-Request from client', addr)
     request = conn.recv(1024)
-    # HTTP-Request anzeigen
+    # Display HTTP-Request
     print('Request:', request)
     
     request = str(request)
@@ -107,7 +107,7 @@ def webserver_hook(gamelogic):
         gamelogic.players[0].moveDown()
 
     
-    # HTTP-Response senden
+    # Send HTTP-Response
     #response = html % str(addr)
     response = html
     conn.send('HTTP/1.0 200 OK\r\nContent-type: text/html\r\n\r\n')

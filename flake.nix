@@ -20,6 +20,9 @@
         alias deploy="ampy put lib && ampy put webserver.py"
         alias reset="ampy reset"
         alias run="ampy run main.py"
+        alias npmCi="ampy put lib && ampy put webserver.py"
+        alias cleanEclipse="ampy reset"
+        alias buildCommand="ampy run main.py"
       '';
     }; 
 
