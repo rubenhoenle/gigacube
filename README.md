@@ -4,6 +4,8 @@ This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxe
 
 ## Gradle (Gigacuberer)
 
+> IMPORTANT: I consider this project feature complete. It is not maintained.
+
 All high business value projects need a gradle project. That's why you can use the following gradle commands for this project:
 
 ```bash
