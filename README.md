@@ -2,6 +2,11 @@
 
 This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxes), a project which was done during the [Hacken mit Licht](https://hacken-mit-licht.de) Hackathon.
 
+# TODO
+- fix corners and direction controls
+- make LED brightness adjustable
+- mark the edges where you die in e.g. red
+
 ## Hardware
 
 900 Pixels are available at a density of 60 Pixels per Meter.

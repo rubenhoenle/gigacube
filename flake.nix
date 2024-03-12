@@ -17,6 +17,7 @@
         AMPY_PORT = "/dev/ttyACM0";
       };
       shellHook = ''
+        alias help="echo \"COMMANDS: deploy, reset, run\""
         alias deploy="ampy put lib && ampy put webserver.py"
         alias reset="ampy reset"
         alias run="ampy run main.py"
