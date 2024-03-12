@@ -1,0 +1,11 @@
+version: "2.4"
+services:
+  oracle:
+    image: gvenzl/oracle-xe:latest
+    env:
+      ORACLE_RANDOM_PASSWORD: true
+      APP_USER: command
+      APP_USER_PASSWORD: command
+    ports:
+      - 1521:1521
+

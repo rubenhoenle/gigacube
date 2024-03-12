@@ -14,6 +14,7 @@
         adafruit-ampy
         jdk21
         gradle
+        podman-compose
       ];
       env = {
         AMPY_PORT = "/dev/ttyACM0";

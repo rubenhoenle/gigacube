@@ -1,3 +1,7 @@
+plugins {
+  id("com.avast.gradle.docker-compose") version "0.17.6"
+}
+
 task deploy(type:Exec) {
     commandLine 'ampy', 'put', 'lib', '&&', 'ampy', 'put', 'webserver.py'
 }
@@ -8,4 +12,8 @@ task reset(type:Exec) {
 
 task run(type:Exec) {
     commandLine 'ampy', 'run', 'main.py'
+}
+
+dockerCompose {
+    useComposeFiles = ['docker-composer.yaml'],
 }
