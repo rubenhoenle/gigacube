@@ -1,0 +1,11 @@
+task deploy(type:Exec) {
+    commandLine 'ampy', 'put', 'lib', '&&', 'ampy', 'put', 'webserver.py'
+}
+
+task reset(type:Exec) {
+    commandLine 'ampy', 'reset'
+}
+
+task run(type:Exec) {
+    commandLine 'ampy', 'run', 'main.py'
+}
