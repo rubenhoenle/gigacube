@@ -123,13 +123,13 @@ class GameLogic:
 
     players = [
         #Player(0, 0, 1),
-        Player(CellPos(front, 0, 0), "up", 2)
+        #Player(CellPos(front, 0, 0), "up", 2)
     ]
     cookies = []#[(0,1),(0,2),(0,3),(0,4),(0,5)]
     display_controller = DisplayController()
     
-    def __init__(self):
-        self.generateCookies()
+    #def __init__(self):
+    #    self.generateCookies()
     
     def checkCookies(self):
         for cookie in self.cookies:
@@ -174,24 +174,32 @@ class GameLogic:
         
     def gameOver(self, timer):
         timer.deinit()
+        self.players = []
+        self.cookies = []
         self.display_controller.fullColor(255, 0, 0)
         sleep_ms(500)
         self.display_controller.fullColor(255, 0, 0)
         sleep_ms(500)
         self.display_controller.fullColor(255, 0, 0)
+        sleep_ms(500)
+        self.display_controller.clearMatrix()
+        self.display_controller.updateMatrix()
 
+    def startGame(self):
         # restart the game
         self.players = [Player(CellPos(self.front, 0, 0), "up", 2)]
         #self.cookies = [(0,1),(0,2),(0,3),(0,4),(0,5)]
         self.cookies = []
         self.generateCookies()
+        timer = Timer(-1)
         timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
 
 gamelogic = GameLogic()
 
-timer = Timer(-1)
-timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
+#timer = Timer(-1)
+#timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
 
+gamelogic.startGame()
 
 i2c = machine.I2C(
         0, scl=machine.Pin(5),
@@ -202,7 +210,7 @@ nun = Nunchuck(i2c)
 
 #sleep_ms(500)
 def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
-    if not nunchuck.joystick_center():
+    if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
         if nunchuck.joystick_up():
             gamelogic.players[player_id].moveUp()
         elif nunchuck.joystick_down():
@@ -211,6 +219,12 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
             gamelogic.players[player_id].moveLeft()
         elif nunchuck.joystick_right():
             gamelogic.players[player_id].moveRight()
+
+    
+    b = nunchuck.buttons()
+    if((b[0] or b[1]) and len(gamelogic.players) == 0): # condition seems to be true for some seconds after the start of the game
+        gamelogic.startGame()
+    #print( b[0], b[1] )
 
 #_thread.start_new_thread(blink, gamelogic)
 
