@@ -2,6 +2,10 @@
 
 This repo is a fork of [mucer/dots_n_boxes](https://github.com/mucer/dots_n_boxes), a project which was done during the [Hacken mit Licht](https://hacken-mit-licht.de) Hackathon.
 
+<p>
+<img src="images/SystemOverview.jpg" alt="SystemOverview">
+</p>
+
 # TODO
 - fix corners and direction controls
 - make LED brightness adjustable
