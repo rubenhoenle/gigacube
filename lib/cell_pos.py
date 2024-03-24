@@ -12,29 +12,39 @@ class CellPos:
     def __hash__(self):
         return hash((self.side.name, self.x, self.y))
 
-    def move(self, direction):
+
+    def move(self, direction) -> Direction:
         old = self.clone()
+        new_direction = direction
+        
         if direction == Direction.UP:
             if (self.y >= self.side.size - 1):
-                self.side.transfer_up(self)
+                return self.side.transfer_up(self)
+                
             else:
                 self.y += 1
+        
         elif direction == Direction.DOWN:
             if (self.y <= 0):
-                self.side.transfer_down(self)
+                return self.side.transfer_down(self)
             else:
                 self.y -= 1
+        
         elif direction == Direction.LEFT:
             if (self.x <= 0):
-                self.side.transfer_left(self)
+                return self.side.transfer_left(self)
             else:
                 self.x -= 1
+        
         elif direction == Direction.RIGHT:
             if (self.x >= self.side.size - 1):
-                self.side.transfer_right(self)
+                return self.side.transfer_right(self)
             else:
                 self.x += 1
-        return self != old
+        
+        if (self == old): raise ValueError("out of bounce")
+
+        return new_direction
     
     def clone(self):
         return CellPos(self.side, self.x, self.y)

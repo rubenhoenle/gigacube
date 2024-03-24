@@ -24,13 +24,20 @@ class Player:
     def move(self):
         self.previous_pos = self.pos.clone()
         d = -1
+        
         if self.direction == "left": d = Direction.LEFT
         elif self.direction == "right": d = Direction.RIGHT
         elif self.direction == "up": d = Direction.UP
         elif self.direction == "down": d = Direction.DOWN
         
-        if not self.pos.move(d):
-            raise ValueError('player went out of matrix')
+        d = self.pos.move(d) # TODO map direction form move
+
+        #print(d)
+        
+        if d == Direction.LEFT: self.direction = "left"
+        elif d == Direction.RIGHT: self.direction =  "right"
+        elif d == Direction.UP: self.direction = "up"
+        elif d == Direction.DOWN: self.direction = "down"
             
     def moveLeft(self):
         if self.direction != "right":
@@ -52,8 +59,9 @@ class Player:
         if len(self.body) > 0:
             self.body.insert(0, self.previous_pos)
             self.body.pop()
+        
         for b in self.body:
-            if self.pos.x == b.x and self.pos.y == b.y: raise ValueError('player bit themselves')
+            if self.pos.x == b.x and self.pos.y == b.y and self.pos.side == b.side: raise ValueError("player hit themself") # TODO massiv but... not checked on which side cell is -> different side same x, y
         
     def addLength(self):
         if len(self.body) == 0:
