@@ -1,4 +1,4 @@
-from enums import Direction
+from .enums import Direction
 
 class Side:
     def __init__(self, name, size):

@@ -1,13 +1,13 @@
-from machine import Pin, Timer, ADC
+from machine import Pin, Timer#, ADC
 from neopixel import NeoPixel
-from time import sleep_ms
+from timeE import sleep_ms
 #import webserver
 from random import randrange
 from lib.cell_pos import CellPos
 from lib.side import Side
 from lib.enums import Direction
 from lib.mapper import Mapper
-from lib.nunchuck import Nunchuck
+#from lib.nunchuck import Nunchuck
 import _thread
 
 MATRIX_SIZE = 15
@@ -207,29 +207,29 @@ gamelogic = GameLogic()
 
 gamelogic.startGame()
 
-i2c = machine.I2C(
-        0, scl=machine.Pin(5),
-        sda=machine.Pin(4),
-        freq=100000)
-sleep_ms(100)
-nun = Nunchuck(i2c)
-
-#sleep_ms(500)
-def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
-    if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
-        if nunchuck.joystick_up():
-            gamelogic.players[player_id].moveUp()
-        elif nunchuck.joystick_down():
-            gamelogic.players[player_id].moveDown()
-        elif nunchuck.joystick_left():
-            gamelogic.players[player_id].moveLeft()
-        elif nunchuck.joystick_right():
-            gamelogic.players[player_id].moveRight()
-
-    
-    b = nunchuck.buttons()
-    if((b[0] or b[1]) and len(gamelogic.players) == 0): # condition seems to be true for some seconds after the start of the game
-        gamelogic.startGame()
+#i2c = machine.I2C(
+#        0, scl=machine.Pin(5),
+#        sda=machine.Pin(4),
+#        freq=100000)
+#sleep_ms(100)
+#nun = Nunchuck(i2c)
+#
+##sleep_ms(500)
+#def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
+#    if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
+#        if nunchuck.joystick_up():
+#            gamelogic.players[player_id].moveUp()
+#        elif nunchuck.joystick_down():
+#            gamelogic.players[player_id].moveDown()
+#        elif nunchuck.joystick_left():
+#            gamelogic.players[player_id].moveLeft()
+#        elif nunchuck.joystick_right():
+#            gamelogic.players[player_id].moveRight()
+#
+#    
+#    b = nunchuck.buttons()
+#    if((b[0] or b[1]) and len(gamelogic.players) == 0): # condition seems to be true for some seconds after the start of the game
+#        gamelogic.startGame()
     #print( b[0], b[1] )
 
 #_thread.start_new_thread(blink, gamelogic)
@@ -244,7 +244,6 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     #        ))
 
     #sleep_ms(2)
-while True:
+#while True:
     #webserver.webserver_hook(gamelogic)
-    nunchuck_update(nun, 0, gamelogic)
-    
+    #nunchuck_update(nun, 0, gamelogic)

@@ -1,6 +1,9 @@
-from hypervisor import HyperVisor
+from .hypervisor import HyperVisor
 
 class NeoPixel:
+
+    noMapper = {17: 0,
+                16: 1}
 
     def __init__(self, pin, length):
         
@@ -23,12 +26,8 @@ class NeoPixel:
         self.show()
 
     def show(self):
-        self.h.cube.setColor(0, self.data)
+        self.h.cube.setColor(NeoPixel.noMapper.get(self.pin.no), self.data)
         self.h.cube.write()
 
     def fill(self, color):
         self.data = [color for _ in range(self.length)]
-
-n = NeoPixel(0, 15 * 15 * 2)
-n[15] = (0, 255, 0)
-n.write()

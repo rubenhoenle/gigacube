@@ -1,6 +1,4 @@
 
-
-
 class HyperVisor(object):
     _instance = None
     cube = None
