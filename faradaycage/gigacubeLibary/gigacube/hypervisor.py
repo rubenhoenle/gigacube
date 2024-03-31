@@ -22,7 +22,7 @@ class HyperVisor(object):
             return self.cube
 
         import threading
-        from gigacube import Gigacube
+        from .gigacube import Gigacube
 
         cube = Gigacube()
 
