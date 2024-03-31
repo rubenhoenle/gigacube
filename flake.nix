@@ -57,8 +57,22 @@
           buildInputs = with pkgs.python39Packages; [
             setuptools
             wheel
+            schedule
           ];
       };
+
+      TimeE = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "timeE";
+          version = "1.0";
+
+          src = ./faradaycage/timeLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+          ];
+      };
+
     };
 
     in
@@ -93,24 +107,28 @@
         ];
         buildInputs = [emulator.NeoPixel
                       emulator.Machine
+                      emulator.TimeE
                       emulator.Gigacube
 
                       # for developing the Visulizier
                       pkgs.python3Packages.pygame
+                      pkgs.python3Packages.schedule
                       pkgs.python3Packages.numpy
                       pkgs.python39Packages.pyopengl
                       ];
 
         env = {
           #AMPY_PORT = "/dev/ttyACM0";
-        };
+        }; 
         shellHook = ''
           echo Safe from any electrical Fields
 
+          export PYTHONPATH="${emulator.TimeE}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.NeoPixel}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.Machine}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.Gigacube}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python3Packages.pygame}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${pkgs.python3Packages.schedule}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python3Packages.numpy}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python39Packages.pyopengl}/lib/python3.9/site-packages:$PYTHONPATH"
         '';
