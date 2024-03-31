@@ -18,6 +18,21 @@
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
 
       emulator = {
+        
+        Gigacube = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "gigacube";
+          version = "1.0";
+
+          src = ./faradaycage/gigacubeLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+            pygame
+            pyopengl
+          ];
+      };
+        
         NeoPixel = pkgs.python39.pkgs.buildPythonPackage rec {
           pname = "neopixel";
           version = "1.0";
@@ -27,6 +42,9 @@
           buildInputs = with pkgs.python39Packages; [
             setuptools
             wheel
+            emulator.Gigacube
+            pygame
+            pyopengl
           ];
       };
 
@@ -75,6 +93,7 @@
         ];
         buildInputs = [emulator.NeoPixel
                       emulator.Machine
+                      emulator.Gigacube
 
                       # for developing the Visulizier
                       pkgs.python3Packages.pygame
@@ -90,6 +109,7 @@
 
           export PYTHONPATH="${emulator.NeoPixel}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.Machine}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${emulator.Gigacube}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python3Packages.pygame}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python3Packages.numpy}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${pkgs.python39Packages.pyopengl}/lib/python3.9/site-packages:$PYTHONPATH"
