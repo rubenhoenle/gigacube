@@ -1,4 +1,4 @@
-from .hypervisor import HyperVisor
+from gigacube import HyperVisor
 
 class NeoPixel:
 
