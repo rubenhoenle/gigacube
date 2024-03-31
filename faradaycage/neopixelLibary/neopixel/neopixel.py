@@ -1,8 +1,10 @@
-
+from hypervisor import HyperVisor
 
 class NeoPixel:
 
     def __init__(self, pin, length):
+        
+        self.h = HyperVisor.instance()
 
         self.pin = pin
         self.length = length
@@ -13,15 +15,20 @@ class NeoPixel:
     def __getitem__(self, index):
         return self.data[index]
 
-    def __setitem__(self, index, color: tuple):
+    def __setitem__(self, index, color):
         # validate color
-        return self.data[index] = color
+        self.data[index] = color
 
     def write(self):
         self.show()
 
     def show(self):
-        pass
+        self.h.cube.setColor(0, self.data)
+        self.h.cube.write()
 
-    def fill(sefl, color: type):
+    def fill(self, color):
         self.data = [color for _ in range(self.length)]
+
+n = NeoPixel(0, 15 * 15 * 2)
+n[15] = (0, 255, 0)
+n.write()
