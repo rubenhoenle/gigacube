@@ -245,7 +245,7 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     #        ))
 
     #sleep_ms(2)
-#while True:
+while True:
     #webserver.webserver_hook(gamelogic)
     #pass
-    #nunchuck_update(nun, 0, gamelogic)
+    nunchuck_update(nun, 0, gamelogic)
