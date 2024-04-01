@@ -32,11 +32,18 @@ class Gigacube:
         (6, 3), (6, 4), (6, 7), (5, 1), (5, 4), (5, 7),
     )
 
+    pressed_keys = {
+        K_UP: False,
+        K_DOWN: False,
+        K_LEFT: False,
+        K_RIGHT: False
+    }
+    buttons = [False, False]
+
     def __init__(self):
 
         self.led_states = [[[(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(self.LED_MATRIX_SIZE)] for _ in range(self.LED_MATRIX_SIZE)] for _ in range(4)]
         self.led_states_buff = [[[(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(self.LED_MATRIX_SIZE)] for _ in range(self.LED_MATRIX_SIZE)] for _ in range(4)]
-        print("in gigacube")
         thread = threading.Thread(target=self.main, args=())
         #thread.daemon = True                            # Daemonize thread
         thread.start() 
@@ -106,15 +113,23 @@ class Gigacube:
                 glVertex3fv(pos)
         glEnd()
 
+    def drawText(self, x, y, text):                                                
+        textSurface = self.font.render(text, True, (0, 0, 0, 255)).convert_alpha()
+        textData = pygame.image.tostring(textSurface, "RGBA", True)
+        glWindowPos2d(x, y)
+        glDrawPixels(textSurface.get_width(), textSurface.get_height(), GL_RGBA, GL_UNSIGNED_BYTE, textData)
+
     def main(self):
         
-        print("test")
-
-        print("test")
         self.display = (800, 600)
         pygame.init()
-        pygame.display.set_mode(self.display, OPENGL | DOUBLEBUF)
+        pygame.display.set_caption("Gigacube")
+        screen = pygame.display.set_mode(self.display, OPENGL | DOUBLEBUF)
         glEnable(GL_DEPTH_TEST)
+        self.font = pygame.font.SysFont('arial', 30)
+
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
 
         glMatrixMode(GL_PROJECTION)
         gluPerspective(45.0, self.display[0] / self.display[1], 0.1, 100.0)
@@ -141,27 +156,49 @@ class Gigacube:
                         self.rotate_angle_y += self.speed
                     elif event.key == pygame.K_s:
                         self.rotate_angle_y -= self.speed
+
+                    # virtuell input
+                    if event.key == pygame.K_c:
+                        self.buttons[0] = True
+                    if event.key == pygame.K_z:
+                        self.buttons[1] = True
+
+                    if event.key in self.pressed_keys:
+                        self.pressed_keys[event.key] = True
+
                 elif event.type == pygame.KEYUP:
                     if event.key in [pygame.K_a, pygame.K_d]:
                         self.rotate_angle_x = 0
                     if event.key in [pygame.K_w, pygame.K_s]:
                         self.rotate_angle_y = 0
 
+                    # virtuell input
+                    if event.key == pygame.K_c:
+                        self.buttons[0] = False
+                    if event.key == pygame.K_z:
+                        self.buttons[1] = False
+
+                    if event.key in self.pressed_keys:
+                        self.pressed_keys[event.key] = False
+
             glClearColor(0.8, 0.8, 1.0, 1.0)
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+            fps = self.clock.get_fps()
+            fps_text = f"FPS: {int(fps)}"
+            self.drawText(10, 560, fps_text)
+            
+            self.drawcube()
+
             glRotatef(self.rotate_angle_x, 0, 1, 0)
             glRotatef(self.rotate_angle_y, 1, 0, 0)
-
-            colorSize1 = random.randint(0, self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)
-            colorSize0 = random.randint(0, self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)
 
             #self.setColor(0, [(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)) if i < colorSize1 else None for i in range(self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)])
             #self.setColor(1, [(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)) if i < colorSize0 else None for i in range(self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)])
             #self.write()
 
-            self.drawcube()
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick()
 
     def setColor(self, index: int, colors: list):
         

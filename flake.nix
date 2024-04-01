@@ -123,6 +123,8 @@
         shellHook = ''
           echo Safe from any electrical Fields
 
+          export VIRTUELL="true"
+
           export PYTHONPATH="${emulator.TimeE}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.NeoPixel}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.Machine}/lib/python3.9/site-packages:$PYTHONPATH"

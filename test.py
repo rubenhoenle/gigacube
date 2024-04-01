@@ -63,7 +63,7 @@ if __name__ == "__main__":
     left.attach_right(front, Direction.LEFT)
     left.attach_top(top, Direction.LEFT)
 
-    right.attach_left(front, Direction.RIGHT)
+    right.attach_left(front, Direction.RIGHT)gtgt
     right.attach_top(top, Direction.RIGHT)
     
     sides = [front, top, left, right]
