@@ -21,9 +21,16 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import os
+virtuell = os.getenv("VIRTUELL") == "true"
 
-import machine
-import time
+print("virtuell: ", virtuell)
+
+if virtuell:
+    import timeE as time
+else:
+    import machine
+    import time
 
 class Nunchuck(object):
     """The Nunchuk object presents the sensor readings in a polling way.
@@ -37,18 +44,27 @@ class Nunchuck(object):
     corresponding update() method does not allocate memory and thereby
     could directly be used as an callback method for a timer interrupt."""
 
+    """supports virtualisation with HyperVisor"""
+
     def __init__(self, i2c, poll=True):
         """Initialize the Nunchuk controller. If no polling is desired it
         can be disabled. Only one controller is possible on one I2C bus,
         because the address of the controller is fixed.
         The maximum stable I2C bus rate is 100kHz (200kHz seem to work on
         mine as well, 400kHz does not)."""
+
+        
         self.i2c = i2c
         self.address = 0x52
         self.buffer = bytearray(b'\x00\x00\x00\x00\x00\x00')
         # There are two initialization sequences documented.
         #self.i2c.writeto(self.address, b'\x40\x00')
         #self.i2c.writeto(self.address, b'\x00')
+        if virtuell:
+            from gigacube import HyperVisor
+            self.h = HyperVisor.instance()
+            return
+
         self.i2c.writeto(self.address, b'\xf0\x55')
         self.i2c.writeto(self.address, b'\xfb\x00')
         self.last_poll = time.ticks_ms()
@@ -62,6 +78,10 @@ class Nunchuck(object):
     def update(self):
         """Requests a sensor readout from the controller and receives the
         six data bits afterwards."""
+        if virtuell:
+            time.sleep_ms(10)
+            return
+        
         self.i2c.writeto(self.address, b'\x00')
         
         time.sleep_ms(10)
@@ -70,12 +90,19 @@ class Nunchuck(object):
 
     def __poll(self):
         """Poll the sensor readouts if necessary."""
+        if virtuell:
+            self.update()
+            return
+        
         if time.ticks_diff(time.ticks_ms(), self.last_poll) > self.polling_threshold:
             self.update()
 
     def accelerator(self):
         """Retrieve the three axis of the last accelerometer reading.
         Returns a tuple of three elements: The x, y and z axis"""
+        if virtuell:
+            raise NotImplementedError
+
         self.__poll()
         return ((self.buffer[2] << 2) + ((self.buffer[5] << 4) >> 6),
             (self.buffer[3] << 2) + ((self.buffer[5] << 2 ) >> 6),
@@ -85,47 +112,72 @@ class Nunchuck(object):
         """Returns a tuple representing the states of the button C and Z
         (in this order). The values are True if the corresponding button
         is being pressed and False otherwise."""
+        if virtuell:
+            self.__poll()
+            return self.h.getButtons()
         self.__poll()
         return (not (self.buffer[5] & 2 == 2), not (self.buffer[5] & 1 == 1))
 
     def joystick(self):
         """Get the X and Y positions of the thumb joystick. For both axis
         a value of 0 means left, ~136 center and 255 right position."""
+        if virtuell:
+            raise NotImplementedError
         self.__poll()
         return (self.buffer[0], self.buffer[1])
 
     def joystick_left(self):
         """Returns True if the joystick is being held to the left side."""
+        if virtuell:
+            self.__poll()
+            return self.h.isLeft()
+        
         self.__poll()
         return self.buffer[0] < 55
 
     def joystick_right(self):
         """Returns True if the joystick is being held to the right side."""
+        if virtuell:
+            self.__poll()
+            return self.h.isRight()
         self.__poll()
         return self.buffer[0] > 200
 
     def joystick_up(self):
         """Returns True if the joystick is being held to the upper side."""
+        if virtuell:
+            self.__poll()
+            return self.h.isUp()
         self.__poll()
         return self.buffer[1] > 200
 
     def joystick_down(self):
         """Returns True if the joystick is being held to the lower side."""
+        if virtuell:
+            self.__poll()
+            return self.h.isDown()
         self.__poll()
         return self.buffer[1] < 55
 
     def joystick_center(self):
         """Returns True if the joystick is not moved away fromthe center
         position."""
+        if virtuell:
+            self.__poll()
+            return self.h.isCenter()
         self.__poll()
         return self.buffer[0] > 100 and self.buffer[0] < 155 and self.buffer[1] > 100 and self.buffer[1] < 155
 
     def joystick_x(self):
         # Returns "normalized" x axis values
+        if virtuell:
+            raise NotImplementedError
         self.__poll()
         return (self.buffer[0] >> 2) - 34
 
     def joystick_y(self):
         # Returns "normalized" x axis values
+        if virtuell:
+            raise NotImplementedError
         self.__poll()
         return (self.buffer[1] >> 2) - 34
