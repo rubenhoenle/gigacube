@@ -42,12 +42,14 @@ class Side:
                 pos.x = self.size - 1    
 
             return self.invert(self.top_dir)           
+        raise ValueError("out of bounds")
 
     def transfer_down(self, pos):
         if hasattr(self, "down"):
             pos.side = self.down
             pos.y = self.size - 1
             return self.invert(self.down_dir)
+        raise ValueError("out of bounds")
 
     def transfer_left(self, pos):
         if hasattr(self, "left"):
@@ -61,9 +63,8 @@ class Side:
                 pos.x = self.size - pos.y - 1
                 pos.y = 0
 
-            #pos.x = self.size - 1
-
             return self.invert(self.left_dir)
+        raise ValueError("out of bounds")
 
     def transfer_right(self, pos):
         if hasattr(self, "right"):
@@ -78,6 +79,7 @@ class Side:
                 pos.y = 0
 
             return self.invert(self.right_dir)
+        raise ValueError("out of bounds")
 
     
     def invert(self, direction):

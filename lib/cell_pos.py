@@ -14,13 +14,11 @@ class CellPos:
 
 
     def move(self, direction) -> Direction:
-        old = self.clone()
         new_direction = direction
         
         if direction == Direction.UP:
             if (self.y >= self.side.size - 1):
                 return self.side.transfer_up(self)
-                
             else:
                 self.y += 1
         
@@ -41,8 +39,6 @@ class CellPos:
                 return self.side.transfer_right(self)
             else:
                 self.x += 1
-        
-        if (self == old): raise ValueError("out of bounce")
 
         return new_direction
     
