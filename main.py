@@ -25,14 +25,12 @@ class Player:
         self.previous_pos = self.pos.clone()
         d = -1
         
-        if self.direction == "left": d = Direction.LEFT
+        if self.direction == "left": d = Direction.LEFT # TODO use Direction in Gamelogic
         elif self.direction == "right": d = Direction.RIGHT
         elif self.direction == "up": d = Direction.UP
         elif self.direction == "down": d = Direction.DOWN
         
-        d = self.pos.move(d) # TODO map direction form move
-
-        #print(d)
+        d = self.pos.move(d)
         
         if d == Direction.LEFT: self.direction = "left"
         elif d == Direction.RIGHT: self.direction =  "right"
@@ -61,7 +59,7 @@ class Player:
             self.body.pop()
         
         for b in self.body:
-            if self.pos.x == b.x and self.pos.y == b.y and self.pos.side == b.side: raise ValueError("player hit themself") # TODO massiv but... not checked on which side cell is -> different side same x, y
+            if self.pos == b: raise ValueError("player hit themself")
         
     def addLength(self):
         if len(self.body) == 0:
