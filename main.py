@@ -8,9 +8,9 @@ from lib.side import Side
 from lib.enums import Direction
 from lib.mapper import Mapper
 from lib.nunchuck import Nunchuck
+from lib.displaycontroller import DisplayController, MATRIX_SIZE
 import _thread
 
-MATRIX_SIZE = 15
 speed = 200
 
 class Player:
@@ -70,38 +70,6 @@ class Player:
     def getSnakePixels(self):
         pass
 
-class DisplayController:
-    
-    def __init__(self):
-        self.mapper = Mapper(MATRIX_SIZE)
-        self.topright_pixels = NeoPixel(Pin(16, Pin.OUT), MATRIX_SIZE * MATRIX_SIZE * 2)
-        self.leftfront_pixels = NeoPixel(Pin(17, Pin.OUT), MATRIX_SIZE * MATRIX_SIZE * 2)
-    
-    def updateMatrix(self):
-        self.topright_pixels.write()
-        self.leftfront_pixels.write()
-    
-    def writePixel(self, side: str, x: int, y: int, color):
-        pixelIndex = self.mapper.pos_to_pixel(side, x, y)
-        
-        if 0 == pixelIndex[0]:
-            self.leftfront_pixels[pixelIndex[1]] = color
-        elif 1 == pixelIndex[0]:
-            self.topright_pixels[pixelIndex[1]] = color
-                
-    def fullColor(self, r, g, b):
-        self.clearMatrix()
-        self.updateMatrix()
-        for i in range(0, MATRIX_SIZE * MATRIX_SIZE * 2): self.topright_pixels[i] = (r, g, b)
-        for i in range(0, MATRIX_SIZE * MATRIX_SIZE * 2): self.leftfront_pixels[i] = (r, g, b)
-        self.updateMatrix()
-        sleep_ms(500)
-        self.clearMatrix()
-        self.updateMatrix()
-        
-    def clearMatrix(self):
-        for m in [self.leftfront_pixels, self.topright_pixels]: m.fill((0, 0, 0))
-        
 class GameLogic:
     front = Side("front", MATRIX_SIZE)
     top = Side("top", MATRIX_SIZE)
