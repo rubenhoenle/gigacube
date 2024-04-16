@@ -1,4 +1,4 @@
-from machine import Pin, Timer, ADC
+from machine import Pin, Timer
 from neopixel import NeoPixel
 from time import sleep_ms
 #import webserver
@@ -23,8 +23,8 @@ class DisplayController:
         self.topright_pixels.write()
         self.leftfront_pixels.write()
     
-    def writePixel(self, side: str, x: int, y: int, color):
-        pixelIndex = self.mapper.pos_to_pixel(side, x, y)
+    def writePixel(self, cell: CellPos, color):
+        pixelIndex = self.mapper.pos_to_pixel(cell.side.name, cell.x, cell.y)
         
         if 0 == pixelIndex[0]:
             self.leftfront_pixels[pixelIndex[1]] = color

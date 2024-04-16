@@ -1,7 +1,7 @@
 from machine import *
 import machine
 from neopixel import NeoPixel
-from timeE import sleep_ms
+from time import sleep_ms
 #import webserver
 from random import randrange
 from lib.cell_pos import CellPos
@@ -129,13 +129,13 @@ class GameLogic:
         
     def writePlayerPosToMatrix(self):
         for player in self.players:
-            self.display_controller.writePixel(player.pos.side.name, player.pos.x, player.pos.y, self.snake_color)
+            self.display_controller.writePixel(player.pos, self.snake_color)
             for b in player.body:
-                self.display_controller.writePixel(b.side.name, b.x, b.y, self.snake_color)
+                self.display_controller.writePixel(b, self.snake_color)
             
     def writeCookiesToMatrix(self):
         for cookie in self.cookies:
-            self.display_controller.writePixel(cookie.side.name, cookie.x, cookie.y, self.cookie_color)
+            self.display_controller.writePixel(cookie, self.cookie_color)
             
     def tick(self, timer):
         self.display_controller.clearMatrix()
