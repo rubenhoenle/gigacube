@@ -11,8 +11,9 @@ from lib.mapper import Mapper
 from lib.nunchuck import Nunchuck
 from lib.displaycontroller import DisplayController, MATRIX_SIZE
 import _thread
+import gc
 
-speed = 200
+speed = 1000 
 
 class Player:
 
@@ -53,7 +54,8 @@ class Player:
     def moveDown(self):
         if self.direction != Direction.UP:
             self.direction = Direction.DOWN
-    
+
+    @micropython.native
     def calculateNewArea(self):
         sidesNeeded = {punkt.side for punkt in self.trail}
         visited = set()
@@ -72,13 +74,16 @@ class Player:
         area.update(trail)  # Use cached object reference
         trail.clear()  # Use cached object reference
 
+    @micropython.native
     def checkHitInAllDirections(self, side, x, y, visited):
+        gc.collect()
         directions = [Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT]
         hits = {direction: self.checkHitInDirection(direction, side, x, y, visited) for direction in directions}
         return hits[Direction.UP], hits[Direction.DOWN], hits[Direction.LEFT], hits[Direction.RIGHT]
 
+    @micropython.native
     def checkHitInDirection(self, direction: Direction, side, x, y, visited) -> set:
-        sleep_ms(10)
+        return set()
         c = CellPos(side, x, y)
         area = set()
         while True:
@@ -91,8 +96,6 @@ class Player:
                 c.move(direction)
             except ValueError:
                 return set()
-
-
 
     def update(self) -> bool:
         self.direction = self.head.move(self.direction)
@@ -136,7 +139,7 @@ class Snake:
 
 
     
-    def updatePlayers(self):
+    def updatePlayers(self, timer):
         """updadates all players head, area and trail. Checks for collision and out of bounce"""
         toRemove = [] # so that players can hit each ohter at the same time
 
@@ -180,7 +183,7 @@ class Snake:
         """main game tick loop"""
         self.display_controller.clearMatrix()
         
-        self.updatePlayers()
+        self.updatePlayers(timer)
         
         if len(self.players) == 0:
             self.gameOver(timer)
@@ -212,7 +215,13 @@ i2c = machine.I2C(
         sda=machine.Pin(4),
         freq=100000)
 sleep_ms(100)
+i2c2 = machine.I2C(
+        0, scl=machine.Pin(7),
+        sda=machine.Pin(6),
+        freq=100000)
+sleep_ms(100)
 nun = Nunchuck(i2c)
+nun2 = Nunchuck(i2c2)
 
 #sleep_ms(500)
 def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic):
@@ -222,7 +231,6 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic):
             sleep_ms(10) 
         return
 
-    sleep_ms(1000)
 
     if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
         if nunchuck.joystick_up():
@@ -234,7 +242,7 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic):
         elif nunchuck.joystick_right():
             gamelogic.players[player_id].moveRight()
 
-    
+    sleep_ms(1000) 
     b = nunchuck.buttons()
     if((b[0] or b[1]) and len(gamelogic.players) == 0): # condition seems to be true for some seconds after the start of the game
         gamelogic.startGame()
@@ -245,4 +253,4 @@ if __name__ == "__main__":
 
     while True:
         nunchuck_update(nun, 0, snake)
-        nunchuck_update(nun, 1, snake)
+        nunchuck_update(nun2, 1, snake)
