@@ -21,6 +21,8 @@ class Player:
         self.direction = direction
         self.body = []
         self.previous_pos = self.pos
+
+        self.snake_color = (randrange(00, 255), randrange(0, 255), randrange(0, 255))
         
     def move(self):
         self.previous_pos = self.pos.clone()
@@ -93,7 +95,6 @@ class GameLogic:
     
     sides = [front, top, left, right]
     
-    snake_color = (0, 200, 0)
     cookie_color = (200, 200, 200)
 
     players = [
@@ -129,9 +130,9 @@ class GameLogic:
         
     def writePlayerPosToMatrix(self):
         for player in self.players:
-            self.display_controller.writePixel(player.pos, self.snake_color)
+            self.display_controller.writePixel(player.pos, player.snake_color)
             for b in player.body:
-                self.display_controller.writePixel(b, self.snake_color)
+                self.display_controller.writePixel(b, player.snake_color)
             
     def writeCookiesToMatrix(self):
         for cookie in self.cookies:
@@ -162,7 +163,7 @@ class GameLogic:
 
     def startGame(self):
         # restart the game
-        self.players = [Player(CellPos(self.front, 0, 0), "up", 2)]
+        self.players = [Player(CellPos(self.front, 0, 0), "up", 2), Player(CellPos(self.left, 0, 0), "up", 3)]
         #self.cookies = [(0,1),(0,2),(0,3),(0,4),(0,5)]
         self.cookies = []
         self.generateCookies()
@@ -176,12 +177,19 @@ gamelogic = GameLogic()
 
 gamelogic.startGame()
 
-i2c = machine.I2C(
+#i2c = machine.I2C(
+#        0, scl=machine.Pin(5),
+#        sda=machine.Pin(4),
+#       freq=100000)
+sleep_ms(100)
+i2c2 = machine.I2C(
         0, scl=machine.Pin(5),
         sda=machine.Pin(4),
         freq=100000)
 sleep_ms(100)
-nun = Nunchuck(i2c)
+#nun = Nunchuck(i2c)
+sleep_ms(100)
+nun2 = Nunchuck(i2c2)
 
 #sleep_ms(500)
 def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
@@ -211,9 +219,10 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     #        a[0], a[1], a[2],
     #        b[0], b[1]
     #        ))
-
+0
     #sleep_ms(2)
 while True:
     #webserver.webserver_hook(gamelogic)
-    #pass
-    nunchuck_update(nun, 0, gamelogic)
+    pass
+#    nunchuck_update(nun, 0, gamelogic)
+    nunchuck_update(nun2, 0, gamelogic)
