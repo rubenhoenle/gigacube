@@ -25,7 +25,8 @@ class Player:
         self.previous_pos = self.pos
         self.body_color = snake_color.copy()
         self.body_color[2] = 10
-        
+        self.alive = True
+
     def move(self):
         self.previous_pos = self.pos.clone()
         d = -1
@@ -99,7 +100,7 @@ class GameLogic:
     
     idle = False
 
-    cookie_color = (200, 200, 200)
+    cookie_color = (10, 10, 10)
 
     players = [
         #Player(0, 0, 1),
@@ -127,13 +128,13 @@ class GameLogic:
             self.cookies.append(CellPos(self.sides[i], randrange(MATRIX_SIZE-1),randrange(MATRIX_SIZE-1)))
     
     def movePlayers(self):
-        toremove = []
-
         for player in self.players:
+            if not player.alive:
+                continue
             try:
                 player.move()
             except ValueError:
-                self.players.remove(player)
+                player.alive = False
                 continue
             
             for other in self.players:
@@ -141,17 +142,16 @@ class GameLogic:
                     continue
 
                 if player.pos in other.body:
-                    toremove.append(player)
+                    player.alive = False
 
             self.checkCookies()
             player.moveBody()
-        
-        for remove in toremove:
-            self.players.remove(remove)
-
 
     def writePlayerPosToMatrix(self):
         for player in self.players:
+            if not player.alive:
+                continue
+
             self.display_controller.writePixel(player.pos, player.snake_color)
             for b in player.body:
                 self.display_controller.writePixel(b, player.body_color)
@@ -162,16 +162,36 @@ class GameLogic:
             
     def tick(self, timer):
         self.display_controller.clearMatrix()
-        try:
-            self.movePlayers()
-        except ValueError:
-            self.gameOver(timer)
+        
+        self.movePlayers()
+        
         self.writePlayerPosToMatrix()
         self.writeCookiesToMatrix()
         self.display_controller.updateMatrix()
-        if len(self.players) == 0:
+
+        still_alive = 0
+        last_one = None # if only one left this is the one
+
+        for player in self.players:
+            if player.alive:
+                still_alive += 1
+                last_one = player
+
+        if still_alive == 1:
+            self.win_animation(timer, last_one)
+        if still_alive == 0:
             self.gameOver(timer)
-        
+    
+    def win_animation(self, timer, player: Player):
+        timer.deinit()
+        self.display_controller.fullColor(player.snake_color[0], player.snake_color[1], player.snake_color[2])
+        sleep_ms(200)
+        self.display_controller.fullColor(player.snake_color[0], player.snake_color[1], player.snake_color[2])
+        self.idle = True
+        self.payers = []
+        self.display_controller.clearMatrix()
+        self.display_controller.updateMatrix()
+
     def gameOver(self, timer):
         timer.deinit()
         self.players = []
@@ -189,13 +209,10 @@ class GameLogic:
     def startGame(self):
         # restart the game
 
-        first_player = [255, 0, 0]
-        second_player = [0, 255, 0]
+        first_player = [0, 0, 255]
+        second_player = [100, 100, 0]
 
         self.players = [Player(CellPos(self.right, 7, 0), "up", 2, first_player), Player(CellPos(self.left, 7, 0), "up", 3, second_player)]
-        
-        self.players[1].snake_color[0] = 255 - self.players[0].snake_color[0]
-        self.players[1].snake_color[1] = 255 - self.players[0].snake_color[1]
 
         #self.cookies = [(0,1),(0,2),(0,3),(0,4),(0,5)]
         self.cookies = []
