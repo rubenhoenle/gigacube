@@ -45,7 +45,6 @@ class Gigacube:
         self.led_states = [[[(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(self.LED_MATRIX_SIZE)] for _ in range(self.LED_MATRIX_SIZE)] for _ in range(4)]
         self.led_states_buff = [[[(random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) for _ in range(self.LED_MATRIX_SIZE)] for _ in range(self.LED_MATRIX_SIZE)] for _ in range(4)]
         thread = threading.Thread(target=self.main, args=())
-        #thread.daemon = True                            # Daemonize thread
         thread.start() 
 
 
@@ -157,7 +156,7 @@ class Gigacube:
                     elif event.key == pygame.K_s:
                         self.rotate_angle_y -= self.speed
 
-                    # virtuell input
+                    # virtual input
                     if event.key == pygame.K_c:
                         self.buttons[0] = True
                     if event.key == pygame.K_z:
@@ -172,7 +171,7 @@ class Gigacube:
                     if event.key in [pygame.K_w, pygame.K_s]:
                         self.rotate_angle_y = 0
 
-                    # virtuell input
+                    # virtual input
                     if event.key == pygame.K_c:
                         self.buttons[0] = False
                     if event.key == pygame.K_z:
@@ -192,10 +191,6 @@ class Gigacube:
 
             glRotatef(self.rotate_angle_x, 0, 1, 0)
             glRotatef(self.rotate_angle_y, 1, 0, 0)
-
-            #self.setColor(0, [(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)) if i < colorSize1 else None for i in range(self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)])
-            #self.setColor(1, [(random.randint(0, 256), random.randint(0, 256), random.randint(0, 256)) if i < colorSize0 else None for i in range(self.LED_MATRIX_SIZE * self.LED_MATRIX_SIZE * 2)])
-            #self.write()
 
             pygame.display.flip()
             self.clock.tick()

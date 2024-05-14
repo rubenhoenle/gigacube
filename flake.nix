@@ -117,13 +117,10 @@
                       pkgs.python39Packages.pyopengl
                       ];
 
-        env = {
-          #AMPY_PORT = "/dev/ttyACM0";
-        }; 
         shellHook = ''
           echo Safe from any electrical Fields
 
-          export VIRTUELL="true"
+          export virtual="true"
 
           export PYTHONPATH="${emulator.TimeE}/lib/python3.9/site-packages:$PYTHONPATH"
           export PYTHONPATH="${emulator.NeoPixel}/lib/python3.9/site-packages:$PYTHONPATH"

@@ -25,18 +25,11 @@ class Timer:
     def deinit(self):
         self.running = False
 
-    def _timer_func(self):
-        while self.running:
-            self.semaphore.acquire()
-            time.sleep(self.period)
-            if self.running:
-                self.callback(self)
-            self.semaphore.release()
-
     def call(self):
         if self.period is None or self.mode is None or self.callback is None:
             raise ValueError("Timer not initialized properly")
         
         self.callback(self)
         
-        threading.Timer(self.period, self.call).start()
+        if self.running:
+            threading.Timer(self.period, self.call).start()
