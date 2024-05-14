@@ -16,12 +16,74 @@
         inherit system;
       };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
+
+      emulator = {
+        
+        Gigacube = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "gigacube";
+          version = "1.0";
+
+          src = ./faradaycage/gigacubeLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+            pygame
+            pyopengl
+          ];
+      };
+        
+        NeoPixel = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "neopixel";
+          version = "1.0";
+
+          src = ./faradaycage/neopixelLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+            emulator.Gigacube
+            pygame
+            pyopengl
+          ];
+      };
+
+      Machine = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "machine";
+          version = "1.0";
+
+          src = ./faradaycage/machineLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+            schedule
+          ];
+      };
+
+      TimeE = pkgs.python39.pkgs.buildPythonPackage rec {
+          pname = "timeE";
+          version = "1.0";
+
+          src = ./faradaycage/timeLibary;
+
+          buildInputs = with pkgs.python39Packages; [
+            setuptools
+            wheel
+          ];
+      };
+
+    };
+
     in
     {
       formatter.${system} = treefmtEval.config.build.wrapper;
       checks.${system}.formatter = treefmtEval.config.build.check self;
 
-      devShells.${system}.default = pkgs.mkShell {
+      devShells.${system} = {
+        
+        default = pkgs.mkShell {
+      
         packages = with pkgs; [
           adafruit-ampy
         ];
@@ -37,6 +99,39 @@
           alias cleanEclipse="ampy reset"
           alias buildCommand="ampy run main.py"
         '';
+      };
+      
+      faradaycage = pkgs.mkShell {
+        packages = [
+              pkgs.python3
+        ];
+        buildInputs = [emulator.NeoPixel
+                      emulator.Machine
+                      emulator.TimeE
+                      emulator.Gigacube
+
+                      # for developing the Visulizier
+                      pkgs.python3Packages.pygame
+                      pkgs.python3Packages.schedule
+                      pkgs.python3Packages.numpy
+                      pkgs.python39Packages.pyopengl
+                      ];
+
+        shellHook = ''
+          echo Safe from any electrical Fields
+
+          export virtual="true"
+
+          export PYTHONPATH="${emulator.TimeE}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${emulator.NeoPixel}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${emulator.Machine}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${emulator.Gigacube}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${pkgs.python3Packages.pygame}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${pkgs.python3Packages.schedule}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${pkgs.python3Packages.numpy}/lib/python3.9/site-packages:$PYTHONPATH"
+          export PYTHONPATH="${pkgs.python39Packages.pyopengl}/lib/python3.9/site-packages:$PYTHONPATH"
+        '';
+      };
       };
 
     };

@@ -1,4 +1,4 @@
-from enums import Direction
+from .enums import Direction
 from side import Side
 from cell_pos import CellPos
 

@@ -1,4 +1,4 @@
-from enums import Direction
+from .enums import Direction
 
 class CellPos:
     def __init__(self, side, x, y):

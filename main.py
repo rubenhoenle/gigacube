@@ -1,4 +1,5 @@
-from machine import Pin, Timer, ADC
+from machine import *
+import machine
 from neopixel import NeoPixel
 from time import sleep_ms
 #import webserver
@@ -8,19 +9,24 @@ from lib.side import Side
 from lib.enums import Direction
 from lib.mapper import Mapper
 from lib.nunchuck import Nunchuck
+from lib.displaycontroller import DisplayController, MATRIX_SIZE
 import _thread
+from lib.fsck import IdleScreen
 
-MATRIX_SIZE = 15
 speed = 200
 
 class Player:
-    def __init__(self, pos, direction, player_id):
+    def __init__(self, pos, direction, player_id, snake_color):
         self.pos = pos
         self.player_id = player_id
         self.direction = direction
         self.body = []
+        self.snake_color = snake_color
         self.previous_pos = self.pos
-        
+        self.body_color = snake_color.copy()
+        self.body_color[2] = 10
+        self.alive = True
+
     def move(self):
         self.previous_pos = self.pos.clone()
         d = -1
@@ -70,38 +76,6 @@ class Player:
     def getSnakePixels(self):
         pass
 
-class DisplayController:
-    
-    def __init__(self):
-        self.mapper = Mapper(MATRIX_SIZE)
-        self.topright_pixels = NeoPixel(Pin(16, Pin.OUT), MATRIX_SIZE * MATRIX_SIZE * 2)
-        self.leftfront_pixels = NeoPixel(Pin(17, Pin.OUT), MATRIX_SIZE * MATRIX_SIZE * 2)
-    
-    def updateMatrix(self):
-        self.topright_pixels.write()
-        self.leftfront_pixels.write()
-    
-    def writePixel(self, side: str, x: int, y: int, color):
-        pixelIndex = self.mapper.pos_to_pixel(side, x, y)
-        
-        if 0 == pixelIndex[0]:
-            self.leftfront_pixels[pixelIndex[1]] = color
-        elif 1 == pixelIndex[0]:
-            self.topright_pixels[pixelIndex[1]] = color
-                
-    def fullColor(self, r, g, b):
-        self.clearMatrix()
-        self.updateMatrix()
-        for i in range(0, MATRIX_SIZE * MATRIX_SIZE * 2): self.topright_pixels[i] = (r, g, b)
-        for i in range(0, MATRIX_SIZE * MATRIX_SIZE * 2): self.leftfront_pixels[i] = (r, g, b)
-        self.updateMatrix()
-        sleep_ms(500)
-        self.clearMatrix()
-        self.updateMatrix()
-        
-    def clearMatrix(self):
-        for m in [self.leftfront_pixels, self.topright_pixels]: m.fill((0, 0, 0))
-        
 class GameLogic:
     front = Side("front", MATRIX_SIZE)
     top = Side("top", MATRIX_SIZE)
@@ -124,8 +98,9 @@ class GameLogic:
     
     sides = [front, top, left, right]
     
-    snake_color = (0, 200, 0)
-    cookie_color = (20, 20, 20)
+    idle = False
+
+    cookie_color = (10, 10, 10)
 
     players = [
         #Player(0, 0, 1),
@@ -148,73 +123,129 @@ class GameLogic:
         self.generateCookies()
                     
     def generateCookies(self):
-        while len(self.cookies) < 6:
+        while len(self.cookies) < 40:
             i = randrange(len(self.sides))
             self.cookies.append(CellPos(self.sides[i], randrange(MATRIX_SIZE-1),randrange(MATRIX_SIZE-1)))
     
     def movePlayers(self):
         for player in self.players:
-            player.move()
+            if not player.alive:
+                continue
+            try:
+                player.move()
+            except ValueError:
+                player.alive = False
+                continue
+            
+            for other in self.players:
+                if player == other:
+                    continue
+
+                if player.pos in other.body:
+                    player.alive = False
+
             self.checkCookies()
             player.moveBody()
-        
+
     def writePlayerPosToMatrix(self):
         for player in self.players:
-            self.display_controller.writePixel(player.pos.side.name, player.pos.x, player.pos.y, self.snake_color)
+            if not player.alive:
+                continue
+
+            self.display_controller.writePixel(player.pos, player.snake_color)
             for b in player.body:
-                self.display_controller.writePixel(b.side.name, b.x, b.y, self.snake_color)
+                self.display_controller.writePixel(b, player.body_color)
             
     def writeCookiesToMatrix(self):
         for cookie in self.cookies:
-            self.display_controller.writePixel(cookie.side.name, cookie.x, cookie.y, self.cookie_color)
+            self.display_controller.writePixel(cookie, self.cookie_color)
             
     def tick(self, timer):
         self.display_controller.clearMatrix()
-        try:
-            self.movePlayers()
-        except ValueError:
-            self.gameOver(timer)
+        
+        self.movePlayers()
+        
         self.writePlayerPosToMatrix()
         self.writeCookiesToMatrix()
         self.display_controller.updateMatrix()
-        
+
+        still_alive = 0
+        last_one = None # if only one left this is the one
+
+        for player in self.players:
+            if player.alive:
+                still_alive += 1
+                last_one = player
+
+        if still_alive == 1:
+            self.win_animation(timer, last_one)
+        elif still_alive == 0:
+            self.gameOver(timer)
+    
+    def win_animation(self, timer, player: Player):
+        timer.deinit()
+        self.display_controller.fullColor(player.snake_color[0], player.snake_color[1], player.snake_color[2])
+        sleep_ms(200)
+        self.display_controller.fullColor(player.snake_color[0], player.snake_color[1], player.snake_color[2])
+        self.idle = True
+        self.payers = []
+        self.display_controller.clearMatrix()
+        self.display_controller.updateMatrix()
+
     def gameOver(self, timer):
         timer.deinit()
         self.players = []
         self.cookies = []
         self.display_controller.fullColor(255, 0, 0)
-        sleep_ms(500)
+        sleep_ms(200)
         self.display_controller.fullColor(255, 0, 0)
-        sleep_ms(500)
+        sleep_ms(200)
         self.display_controller.fullColor(255, 0, 0)
-        sleep_ms(500)
+        sleep_ms(200)
         self.display_controller.clearMatrix()
         self.display_controller.updateMatrix()
+        self.idle = True
 
     def startGame(self):
         # restart the game
-        self.players = [Player(CellPos(self.front, 0, 0), "up", 2)]
+
+        first_player = [0, 0, 255]
+        second_player = [100, 100, 0]
+
+        self.players = [Player(CellPos(self.right, 7, 0), "up", 2, first_player), Player(CellPos(self.left, 7, 0), "up", 3, second_player)]
+
         #self.cookies = [(0,1),(0,2),(0,3),(0,4),(0,5)]
         self.cookies = []
         self.generateCookies()
+        self.idle = False
+        self.display_controller.clearMatrix()
+        self.display_controller.fullColor(0, 255, 0)
+        self.display_controller.updateMatrix()
+        sleep_ms(100)
         timer = Timer(-1)
         timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
 
 gamelogic = GameLogic()
 
-#timer = Timer(-1)
-#timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
-
 gamelogic.startGame()
 
 i2c = machine.I2C(
+        1, scl=machine.Pin(7),
+        sda=machine.Pin(6),
+       freq=100000)
+
+sleep_ms(100)
+
+i2c2 = machine.I2C(
         0, scl=machine.Pin(5),
         sda=machine.Pin(4),
         freq=100000)
 sleep_ms(100)
-nun = Nunchuck(i2c)
 
-#sleep_ms(500)
+nun = Nunchuck(i2c)
+sleep_ms(100)
+nun2 = Nunchuck(i2c2)
+
 def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
         if nunchuck.joystick_up():
@@ -228,23 +259,15 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
 
     
     b = nunchuck.buttons()
-    if((b[0] or b[1]) and len(gamelogic.players) == 0): # condition seems to be true for some seconds after the start of the game
+    if((b[0] or b[1]) and gamelogic.idle): # condition seems to be true for some seconds after the start of the game
         gamelogic.startGame()
-    #print( b[0], b[1] )
 
-#_thread.start_new_thread(blink, gamelogic)
+idlescreen = IdleScreen(gamelogic.left, gamelogic.display_controller)
 
-    #j = nun.joystick()
-    #a = nun.accelerator()
-    #b = nun.buttons()
-    #print("Joystick: X={0: <3} Y={1: <3} Accelerator: X={2: <3} Y={3: <3} Z={4: <3} Buttons: C={5} Z={6}".format(
-    #        j[0], j[1],
-    #        a[0], a[1], a[2],
-    #        b[0], b[1]
-    #        ))
-
-    #sleep_ms(2)
 while True:
-    #webserver.webserver_hook(gamelogic)
-    nunchuck_update(nun, 0, gamelogic)
-    
+    nunchuck_update(nun, 1, gamelogic)
+    nunchuck_update(nun2, 0, gamelogic)
+    if gamelogic.idle:
+        idlescreen.update()
+        sleep_ms(100)
+        
