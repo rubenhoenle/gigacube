@@ -179,7 +179,7 @@ class GameLogic:
 
         if still_alive == 1:
             self.win_animation(timer, last_one)
-        if still_alive == 0:
+        elif still_alive == 0:
             self.gameOver(timer)
     
     def win_animation(self, timer, player: Player):
@@ -227,9 +227,6 @@ class GameLogic:
 
 gamelogic = GameLogic()
 
-#timer = Timer(-1)
-#timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
-
 gamelogic.startGame()
 
 i2c = machine.I2C(
@@ -249,7 +246,6 @@ nun = Nunchuck(i2c)
 sleep_ms(100)
 nun2 = Nunchuck(i2c2)
 
-#sleep_ms(500)
 def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     if not nunchuck.joystick_center() and len(gamelogic.players) > 0:
         if nunchuck.joystick_up():
@@ -264,26 +260,11 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     
     b = nunchuck.buttons()
     if((b[0] or b[1]) and gamelogic.idle): # condition seems to be true for some seconds after the start of the game
-        print("here")
         gamelogic.startGame()
-
-#_thread.start_new_thread(blink, gamelogic)
-
-    #j = nun.joystick()
-    #a = nun.accelerator()
-    #b = nun.buttons()
-    #print("Joystick: X={0: <3} Y={1: <3} Accelerator: X={2: <3} Y={3: <3} Z={4: <3} Buttons: C={5} Z={6}".format(
-    #        j[0], j[1],
-    #        a[0], a[1], a[2],
-    #        b[0], b[1]
-    #        ))
-0
-    #sleep_ms(2)
 
 idlescreen = IdleScreen(gamelogic.left, gamelogic.display_controller)
 
 while True:
-    #webserver.webserver_hook(gamelogic)
     nunchuck_update(nun, 1, gamelogic)
     nunchuck_update(nun2, 0, gamelogic)
     if gamelogic.idle:

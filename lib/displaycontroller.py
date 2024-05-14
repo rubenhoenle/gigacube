@@ -1,7 +1,6 @@
 from machine import Pin, Timer
 from neopixel import NeoPixel
 from time import sleep_ms
-#import webserver
 from random import randrange
 from .cell_pos import CellPos
 from .side import Side

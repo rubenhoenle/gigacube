@@ -12,7 +12,6 @@ class HyperVisor(object):
             
             cls._instance = cls.__new__(cls)
             cls._instance.cube = cls._instance.start_cube()
-            # Put any initialization here.
         return cls._instance
 
     def start_cube(self):
@@ -23,9 +22,9 @@ class HyperVisor(object):
         import threading
         from .gigacube import Gigacube
 
-        cube = Gigacube()
+        self.cube = Gigacube()
 
-        return cube 
+        return self.cube 
 
     def isUp(self):
         return list(self.cube.pressed_keys.values())[0]
