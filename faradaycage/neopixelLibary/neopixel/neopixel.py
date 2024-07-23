@@ -13,7 +13,6 @@ class NeoPixel:
         self.length = length
 
         self.data = [None for _ in range(self.length)]
-        print("Hello from emulated class")
     
     def __getitem__(self, index):
         return self.data[index]

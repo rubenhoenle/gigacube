@@ -4,7 +4,7 @@ class HyperVisor(object):
     cube = None
 
     def __init__(self):
-        raise RuntimeError('Call instance() instead')
+        raise Runtimerror('Call instance() instead')
 
     @classmethod
     def instance(cls):
