@@ -1,17 +1,12 @@
-from machine import *
 import machine
-from neopixel import NeoPixel
-from time import sleep_ms
-#import webserver
+from timeE import sleep_ms
 from random import randrange
 from lib.cell_pos import CellPos
 from lib.side import Side
 from lib.enums import Direction
-from lib.mapper import Mapper
 from lib.nunchuck import Nunchuck
 from lib.displaycontroller import DisplayController, MATRIX_SIZE
-import _thread
-from lib.fsck import IdleScreen
+from lib.idle import IdleScreen
 
 speed = 200
 
@@ -103,21 +98,15 @@ class GameLogic:
     cookie_color = (10, 10, 10)
 
     players = [
-        #Player(0, 0, 1),
-        #Player(CellPos(front, 0, 0), "up", 2)
     ]
-    cookies = []#[(0,1),(0,2),(0,3),(0,4),(0,5)]
+    cookies = []
     display_controller = DisplayController()
-    
-    #def __init__(self):
-    #    self.generateCookies()
     
     def checkCookies(self):
         for cookie in self.cookies:
             for player in self.players:
                 pass
                 if cookie.x == player.pos.x and cookie.y == player.pos.y:
-                    # self.display_controller.fullColor(0, 22, 0)
                     player.addLength()
                     self.cookies.remove(cookie)
         self.generateCookies()
@@ -177,10 +166,10 @@ class GameLogic:
                 still_alive += 1
                 last_one = player
 
-        if still_alive == 1:
-            self.win_animation(timer, last_one)
-        elif still_alive == 0:
+        if still_alive == 0:
             self.gameOver(timer)
+        elif still_alive == 1 and last_one:
+            self.win_animation(timer, last_one)
     
     def win_animation(self, timer, player: Player):
         timer.deinit()
@@ -209,12 +198,11 @@ class GameLogic:
     def startGame(self):
         # restart the game
 
-        first_player = [0, 0, 255]
-        second_player = [100, 100, 0]
+        first_player_color = [0, 0, 255]
+        second_player_color = [100, 100, 0]
 
-        self.players = [Player(CellPos(self.right, 7, 0), "up", 2, first_player), Player(CellPos(self.left, 7, 0), "up", 3, second_player)]
+        self.players = [Player(CellPos(self.right, 7, 0), "up", 2, first_player_color), Player(CellPos(self.left, 7, 0), "up", 3, second_player_color)]
 
-        #self.cookies = [(0,1),(0,2),(0,3),(0,4),(0,5)]
         self.cookies = []
         self.generateCookies()
         self.idle = False
@@ -222,8 +210,8 @@ class GameLogic:
         self.display_controller.fullColor(0, 255, 0)
         self.display_controller.updateMatrix()
         sleep_ms(100)
-        timer = Timer(-1)
-        timer.init(period=speed, mode=Timer.PERIODIC, callback=gamelogic.tick)
+        timer = machine.Timer(-1)
+        timer.init(period=speed, mode=machine.Timer.PERIODIC, callback=gamelogic.tick)
 
 gamelogic = GameLogic()
 
@@ -262,7 +250,7 @@ def nunchuck_update(nunchuck: Nunchuck, player_id: int, gamelogic: GameLogic):
     if((b[0] or b[1]) and gamelogic.idle): # condition seems to be true for some seconds after the start of the game
         gamelogic.startGame()
 
-idlescreen = IdleScreen(gamelogic.left, gamelogic.display_controller)
+idlescreen = IdleScreen(gamelogic.right, gamelogic.display_controller)
 
 while True:
     nunchuck_update(nun, 1, gamelogic)

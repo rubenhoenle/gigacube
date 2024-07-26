@@ -1,13 +1,8 @@
-from machine import Pin, Timer
+from machine import Pin
 from neopixel import NeoPixel
-from time import sleep_ms
-from random import randrange
+from timeE import sleep_ms
 from .cell_pos import CellPos
-from .side import Side
-from .enums import Direction
 from .mapper import Mapper
-from .nunchuck import Nunchuck
-import _thread
 
 MATRIX_SIZE = 15
 
