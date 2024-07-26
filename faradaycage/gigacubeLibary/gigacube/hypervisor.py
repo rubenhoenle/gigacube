@@ -1,7 +1,6 @@
 
 class HyperVisor(object):
     _instance = None
-    cube = None
 
     def __init__(self):
         raise Runtimerror('Call instance() instead')
@@ -16,10 +15,6 @@ class HyperVisor(object):
 
     def start_cube(self):
 
-        if self.cube != None:
-            return self.cube
-
-        import threading
         from .gigacube import Gigacube
 
         self.cube = Gigacube()
