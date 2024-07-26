@@ -12,7 +12,6 @@ class CellPos:
     def __hash__(self):
         return hash((self.side.name, self.x, self.y))
 
-
     def move(self, direction) -> Direction:
         new_direction = direction
         

@@ -1,6 +1,6 @@
 from .enums import Direction
-from side import Side
-from cell_pos import CellPos
+from .side import Side
+from .cell_pos import CellPos
 
 SIZE = 3
         
@@ -27,20 +27,40 @@ def test_borders():
     max = SIZE - 1
 
     pos = CellPos(front, 0, 0)
-    pos.move(Direction.DOWN)
-    assert str(pos) == str(CellPos(front, 0, 0))
+    fail = False
+    try:
+        pos.move(Direction.DOWN)
+    except ValueError: 
+        fail = True
+    finally:
+        assert fail
 
     pos = CellPos(left, 0, 0)
-    pos.move(Direction.LEFT)
-    assert str(pos) == str(CellPos(left, 0, 0))
+    fail = False
+    try:
+        pos.move(Direction.LEFT)
+    except ValueError: 
+        fail = True
+    finally:
+        assert fail
 
     pos = CellPos(right, max, 0)
-    pos.move(Direction.RIGHT)
-    assert str(pos) == str(CellPos(right, max, 0))
+    fail = False
+    try:
+        pos.move(Direction.RIGHT)
+    except ValueError: 
+        fail = True
+    finally:
+        assert fail
 
     pos = CellPos(top, 0, max)
-    pos.move(Direction.UP)
-    assert str(pos) == str(CellPos(top, 0, max))
+    fail = False
+    try:
+        pos.move(Direction.UP)
+    except ValueError: 
+        fail = True
+    finally:
+        assert fail
 
 def test_edges():
     max = SIZE - 1
@@ -59,6 +79,7 @@ def test_edges():
     assert str(pos) == str(CellPos(top, 0, 0))
 
     pos.move(Direction.LEFT)
+    print(pos)
     assert str(pos) == str(CellPos(left, max, max))
 
     pos.move(Direction.RIGHT)
