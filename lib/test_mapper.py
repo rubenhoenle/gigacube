@@ -1,4 +1,4 @@
-from mapper import Mapper
+from .mapper import Mapper
 
 def test_index_for_pos():
     

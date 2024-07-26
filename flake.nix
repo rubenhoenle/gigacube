@@ -115,6 +115,7 @@
                       pkgs.python3Packages.schedule
                       pkgs.python3Packages.numpy
                       pkgs.python39Packages.pyopengl
+                      pkgs.python39Packages.pytest
                       ];
 
         shellHook = ''

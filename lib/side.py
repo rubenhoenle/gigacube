@@ -57,7 +57,7 @@ class Side:
             if self.left_dir == Direction.RIGHT:
                 pos.x = self.size - 1
             elif self.left_dir == Direction.UP:
-                pos.x = self.size - pos.y
+                pos.x = self.size - pos.y - 1
                 pos.y = self.size - 1
             elif self.left_dir == Direction.DOWN:
                 pos.x = self.size - pos.y - 1
