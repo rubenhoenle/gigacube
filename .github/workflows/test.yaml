@@ -1,36 +1,15 @@
-name: test
+name: "Test"
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
-permissions:
-  contents: read
+    branch: ["main"]
+  push:
+    branch: ["**"]
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - uses: cachix/install-nix-action@v27
       with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pytest
-                
-    - name: Test with pytest
-      run: |
-        pytest        
-    - name: Archive Pytest test report
-      uses: actions/upload-artifact@v3
-      with:
-        name: SuperTest-test-report
-        path: report
-          
-    - name: Upload Pytest report to GitHub
-      uses: actions/upload-artifact@v3
-      with:
-        name: Pytest-test-report
-        path: report
+        nix_path: nixpkgs=channel:nixos-unstable
+    - run: nix run .#test
