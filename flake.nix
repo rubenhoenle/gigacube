@@ -104,6 +104,7 @@
       faradaycage = pkgs.mkShell {
         packages = [
               pkgs.python3
+              pkgs.python39Packages.pytest
         ];
         buildInputs = [emulator.NeoPixel
                       emulator.Machine
@@ -115,7 +116,6 @@
                       pkgs.python3Packages.schedule
                       pkgs.python3Packages.numpy
                       pkgs.python39Packages.pyopengl
-                      pkgs.python39Packages.pytest
                       ];
 
         shellHook = ''
